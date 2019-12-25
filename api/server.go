@@ -1,43 +1,43 @@
-package main
+package api
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	_ "github.com/joho/godotenv"
 	"log"
-	"net/http"
 	"os"
 )
+
+type Server struct {
+	Router *gin.Engine
+}
+
+func (s *Server) Run(port string) error {
+	server.Router = gin.Default()
+	server.configureRoutes()
+	return s.Router.Run(port)
+}
 
 const (
 	kPort string = "GO_TO_PORT"
 )
 
-func main() {
-	r := gin.Default()
-	api := r.Group("/api/v1")
+var server = Server{}
 
-	// Configure Index
-	api.GET("/", HandleIndex())
-
+func init() {
 	// Load environment variables from .env files
 	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
+}
 
+func Run() {
 	port := os.Getenv(kPort)
 	if port == "" {
 		port = ":8080"
 	}
 
-	if err := r.Run(port); err != nil {
+	if err := server.Run(port); err != nil {
 		log.Println("Failed to start server with error: ")
 		log.Fatal(err)
-	}
-}
-
-func HandleIndex() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.String(http.StatusOK, "OK")
 	}
 }
