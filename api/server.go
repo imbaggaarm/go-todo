@@ -14,11 +14,12 @@ type Server struct {
 func (s *Server) Run(port string) error {
 	server.Router = gin.Default()
 	server.configureRoutes()
+
 	return s.Router.Run(port)
 }
 
 const (
-	kPort string = "GO_TO_PORT"
+	kPort string = "TODO_APP"
 )
 
 var server = Server{}

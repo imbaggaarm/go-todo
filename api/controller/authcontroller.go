@@ -1,6 +1,9 @@
 package controller
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	_ "go-todo/api/model"
+)
 
 func RegisterAccount(c *gin.Context) {
 

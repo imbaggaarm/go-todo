@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"go-todo/api/controller"
+	"go-todo/api/middleware"
 	"net/http"
 )
 
@@ -17,24 +18,24 @@ func (s *Server) configureRoutes() {
 		auth.POST("/register", controller.RegisterAccount)
 		auth.POST("/login", controller.Login)
 		auth.GET("/logout", controller.Logout)
-		auth.POST("/password/change", controller.ChangePassword)
+		auth.POST("/password/change", middleware.AuthMiddleWare(), controller.ChangePassword)
 		auth.POST("/password/forgot", controller.ForgotPassword)
 		auth.POST("/password/reset", controller.ResetPassword)
 
 		// User routes
 		users := v1.Group("/users")
-		//users.POST("") // create user
-		users.GET("/:id", controller.GetUser)
-		users.PUT("/:id", controller.UpdateUser)
+		users.GET("/:id", middleware.AuthMiddleWare(), controller.GetUser)
+		users.PUT("/:id", middleware.AuthMiddleWare(), controller.UpdateUser)
 
 		// To-dos routes
 		todo := v1.Group("/todo")
-		todo.POST("", controller.CreateTodo)
-		todo.GET("/:id", controller.GetTodo)
-		todo.PUT("/:id", controller.UpdateTodo)
-		todo.DELETE("/:id", controller.DeleteTodo)
+		todo.POST("", middleware.AuthMiddleWare(), controller.CreateTodo)
+		todo.GET("/:id", middleware.AuthMiddleWare(), controller.GetTodo)
+		todo.PUT("/:id", middleware.AuthMiddleWare(), controller.UpdateTodo)
+		todo.DELETE("/:id", middleware.AuthMiddleWare(), controller.DeleteTodo)
 
-		v1.GET("/user_todo/:id", controller.GetUserTodo)
+		// User to-do
+		v1.GET("/user_todo/:id", middleware.AuthMiddleWare(), controller.GetUserTodo)
 	}
 }
 
