@@ -16,16 +16,54 @@ type Todo struct {
 	Note        string     `json:"note" gorm:"type:text"`
 }
 
+func (todo *Todo) CreateTodo() error {
+	GetDB().Create(todo)
+	if todo.ID <= 0 {
+		return errors.New("create todo failed. Please retry")
+	}
+	return nil
+}
+
 func GetUserTodos(userID, offSet uint64) (*[]Todo, error) {
-	var results *[]Todo
+	var results []Todo
 	err := GetDB().
 		Where("user_id = ?", userID).
 		Order("id").
 		Offset(offSet).
 		Limit(20).
-		Find(results).Error
+		Find(&results).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, errors.New("connection error. Retry later")
 	}
-	return results, nil
+	return &results, nil
+}
+
+func GetTodo(id, userID uint64) (*Todo, error) {
+	todo := &Todo{}
+	err := GetDB().Where("id = ? and user_id = ?", id, userID).First(todo).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("todo not found")
+		}
+		return nil, errors.New("connection error. Please retry")
+	}
+	return todo, nil
+}
+
+func (todo *Todo) UpdateTodo() error {
+	//TODO: Get to-do by id and owner id
+	//
+	err := GetDB().Update(todo).Error
+	if err != nil {
+		return errors.New("update todo failed. Please retry")
+	}
+	return nil
+}
+
+func DeleteTodo(id uint64) error {
+	err := GetDB().Delete(Todo{}, "id = ?", id).Error
+	if err != nil {
+		return errors.New("connection error. Please retry")
+	}
+	return nil
 }

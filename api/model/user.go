@@ -16,7 +16,7 @@ type User struct {
 	Email       string `json:"email" gorm:"unique;not null" valid:"email"`
 	Username    string `json:"username" gorm:"unique;not null"`
 	Password    string `json:"password,omitempty" gorm:"not null"`
-	Token       string `sql:"-"`
+	Token       string `json:"token" sql:"-"`
 	NewPassword string `json:"new_password,omitempty" sql:"-"`
 }
 

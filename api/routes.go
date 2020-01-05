@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) configureRoutes() {
-	v1 := s.Router.Group("/ap1/v1")
+	v1 := s.Router.Group("/api/v1")
 	{
 		// Handle index
 		v1.GET("", handleIndex())
