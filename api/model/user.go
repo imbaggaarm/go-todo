@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	validator "github.com/asaskevich/govalidator"
 	"github.com/jinzhu/gorm"
 	"go-todo/api/auth"
@@ -10,12 +11,13 @@ import (
 
 type User struct {
 	gorm.Model
-	LastName  string `json:"last_name"`
-	FirstName string `json:"first_name"`
-	Email     string `json:"email" gorm:"unique;not null" valid:"email"`
-	Username  string `json:"username" gorm:"unique;not null"`
-	Password  string `json:"password,omitempty" gorm:"not null"`
-	Token     string `sql:"-"`
+	LastName    string `json:"last_name"`
+	FirstName   string `json:"first_name"`
+	Email       string `json:"email" gorm:"unique;not null" valid:"email"`
+	Username    string `json:"username" gorm:"unique;not null"`
+	Password    string `json:"password,omitempty" gorm:"not null"`
+	Token       string `sql:"-"`
+	NewPassword string `json:"new_password,omitempty" sql:"-"`
 }
 
 func (user *User) Validate() (Response, bool) {
@@ -61,6 +63,10 @@ func (user *User) Validate() (Response, bool) {
 	}, true
 }
 
+func (user *User) setToken() {
+	user.Token = auth.CreateTokenString(user.ID)
+}
+
 func (user *User) Create() Response {
 	if resp, ok := user.Validate(); !ok {
 		return resp
@@ -87,18 +93,18 @@ func (user *User) Create() Response {
 	}
 }
 
-func Login(email, password string) Response {
+func verifyUser(email, password string) (*User, *Response) {
 	user := &User{}
 	err := GetDB().Where("email = ? or username = ?", email, email).First(user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return Response{
+			return nil, &Response{
 				Success: false,
 				Error:   "Account not found",
 				Data:    nil,
 			}
 		}
-		return Response{
+		return nil, &Response{
 			Success: false,
 			Error:   "Connection error. Please retry",
 			Data:    nil,
@@ -106,11 +112,19 @@ func Login(email, password string) Response {
 	}
 	err = security.VerifyPassword(user.Password, password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return Response{
+		return nil, &Response{
 			Success: false,
 			Error:   "Wrong password",
 			Data:    nil,
 		}
+	}
+	return user, nil
+}
+
+func Login(email, password string) Response {
+	user, resp := verifyUser(email, password)
+	if resp != nil {
+		return *resp
 	}
 	user.Password = "" // Remove password from response
 	user.setToken()
@@ -121,6 +135,31 @@ func Login(email, password string) Response {
 	}
 }
 
-func (user *User) setToken() {
-	user.Token = auth.CreateTokenString(user.ID)
+func UpdatePassword(email, password, newPassword string) Response {
+	user, resp := verifyUser(email, password)
+	if resp != nil {
+		return *resp
+	}
+	// Hash new password and update
+	hashedPassword, _ := security.Hash(newPassword)
+	GetDB().Model(user).Update("password", string(hashedPassword))
+
+	// TODO: Handle logout of other devices
+	return Response{
+		Success: true,
+		Error:   "",
+		Data:    nil,
+	}
+}
+
+func GetUser(userID uint) (*User, error) {
+	user := &User{}
+	err := GetDB().First(user, userID).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("account not found")
+		}
+		return nil, errors.New("connection error. Please retry")
+	}
+	return user, nil
 }
