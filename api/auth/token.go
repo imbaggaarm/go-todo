@@ -2,7 +2,6 @@ package auth
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"go-todo/api/model"
 	"net/http"
 	"os"
 	"strings"
@@ -12,12 +11,24 @@ const (
 	kTokenPassword string = "TODO_APP_TOKEN_PASSWORD"
 )
 
+type Token struct {
+	jwt.Claims
+	UserID uint `json:"user_id"`
+}
+
+func CreateTokenString(userID uint) string {
+	tk := Token{UserID: userID}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, _ := token.SignedString([]byte(os.Getenv("TODO_APP_TOKEN_PASSWORD")))
+	return tokenString
+}
+
 func ValidateToken(r *http.Request) bool {
 	strToken := ExtractToken(r)
 	if strToken == "" {
 		return false
 	}
-	tk := &model.Token{}
+	tk := &Token{}
 	token, err := jwt.ParseWithClaims(strToken, tk, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv(kTokenPassword)), nil
 	})
@@ -26,10 +37,7 @@ func ValidateToken(r *http.Request) bool {
 		return false
 	}
 
-	if !token.Valid {
-		return false
-	}
-	return true
+	return token.Valid
 }
 
 func ExtractToken(r *http.Request) string {
