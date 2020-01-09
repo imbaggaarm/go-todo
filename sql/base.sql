@@ -32,3 +32,4 @@ create index idx_todos_completed_at
 
 create index idx_todos_user_id
     on todos (user_id);
+
