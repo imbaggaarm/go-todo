@@ -20,7 +20,7 @@ type Token struct {
 func CreateTokenString(userID uint, email string) string {
 	tk := Token{UserID: userID, Email: email}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, _ := token.SignedString([]byte(os.Getenv("TODO_APP_TOKEN_PASSWORD")))
+	tokenString, _ := token.SignedString([]byte(os.Getenv(kTokenPassword)))
 	return tokenString
 }
 

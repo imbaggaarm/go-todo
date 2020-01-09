@@ -104,7 +104,7 @@ func GetUser(userID uint) (*User, error) {
 	err := GetDB().First(user, userID).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("account not found")
+			return nil, errformatter.NewError(errformatter.ErrorRecordNotFound)
 		}
 		return nil, errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
