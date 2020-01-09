@@ -56,7 +56,6 @@ func (user *User) Create() error {
 	if user.ID <= 0 {
 		return errors.New("connection error")
 	}
-	user.Password = "" // Remove password from response
 	user.setToken()
 	return nil
 }
@@ -82,7 +81,6 @@ func Login(email, password string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	user.Password = "" // Remove password from response
 	user.setToken()
 	return user, nil
 }

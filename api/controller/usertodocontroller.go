@@ -23,16 +23,8 @@ func GetUserTodo(c *gin.Context) {
 
 	todos, err := model.GetUserTodos(uint(uID), uint(uOffSet))
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    todos,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(todos))
 }

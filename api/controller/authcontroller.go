@@ -16,18 +16,11 @@ func RegisterAccount(c *gin.Context) {
 	}
 	err := user.Create()
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    user,
-	})
+	user.Password = "" // Remove password from response
+	c.JSON(http.StatusOK, model.SuccessResponse(user))
 }
 
 func Login(c *gin.Context) {
@@ -38,18 +31,11 @@ func Login(c *gin.Context) {
 	}
 	user, err := model.Login(user.Email, user.Password)
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    user,
-	})
+	user.Password = "" // Remove password from response
+	c.JSON(http.StatusOK, model.SuccessResponse(user))
 }
 
 //
@@ -58,7 +44,6 @@ func Login(c *gin.Context) {
 //}
 
 func ChangePassword(c *gin.Context) {
-
 	email, ok := util.GetEmailFromContext(c)
 	if !ok {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())
@@ -71,28 +56,16 @@ func ChangePassword(c *gin.Context) {
 	}
 	_, err := validator.ValidateStruct(request)
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
 	// Update password
 	err = model.UpdatePassword(email, request.Password, request.NewPassword)
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    nil,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(nil))
 }
 
 //

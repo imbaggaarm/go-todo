@@ -14,3 +14,18 @@ func UnauthorizedResponse() Response {
 	}
 }
 
+func ErrorResponse(err error) Response {
+	return Response{
+		Success: false,
+		Error:   err.Error(),
+		Data:    nil,
+	}
+}
+
+func SuccessResponse(data interface{}) Response {
+	return Response{
+		Success: true,
+		Error:   "",
+		Data:    data,
+	}
+}

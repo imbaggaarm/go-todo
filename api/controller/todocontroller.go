@@ -22,18 +22,10 @@ func CreateTodo(c *gin.Context) {
 	todo.UserID = userID
 	err := todo.CreateTodo()
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    todo,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(todo))
 }
 
 func GetTodo(c *gin.Context) {
@@ -47,18 +39,10 @@ func GetTodo(c *gin.Context) {
 	}
 	todo, err := model.GetTodo(uint(uID), userID)
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    todo,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(todo))
 }
 
 func UpdateTodo(c *gin.Context) {
@@ -79,18 +63,10 @@ func UpdateTodo(c *gin.Context) {
 	todo.UserID = userID
 	updatedTodo, err := todo.UpdateTodo()
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    updatedTodo,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(updatedTodo))
 }
 
 func DeleteTodo(c *gin.Context) {
@@ -104,16 +80,8 @@ func DeleteTodo(c *gin.Context) {
 	}
 	err := model.DeleteTodo(uint(uID), userID)
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    nil,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(nil))
 }

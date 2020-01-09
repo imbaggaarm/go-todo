@@ -20,19 +20,11 @@ func GetUserInfo(c *gin.Context) {
 
 	user, err := model.GetUser(uint(uID))
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
 	user.Password = ""
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    user,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(user))
 }
 
 func UpdateUserInfo(c *gin.Context) {
@@ -52,17 +44,9 @@ func UpdateUserInfo(c *gin.Context) {
 	user.ID = userID
 	updatedUser, err := user.Update()
 	if err != nil {
-		c.JSON(http.StatusOK, model.Response{
-			Success: false,
-			Error:   err.Error(),
-			Data:    nil,
-		})
+		c.JSON(http.StatusOK, model.ErrorResponse(err))
 		return
 	}
 	updatedUser.Password = ""
-	c.JSON(http.StatusOK, model.Response{
-		Success: true,
-		Error:   "",
-		Data:    updatedUser,
-	})
+	c.JSON(http.StatusOK, model.SuccessResponse(updatedUser))
 }
