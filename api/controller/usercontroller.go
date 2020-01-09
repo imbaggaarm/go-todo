@@ -11,7 +11,7 @@ import (
 func GetUserInfo(c *gin.Context) {
 	id := c.Param("id")
 	uID, _ := strconv.ParseUint(id, 10, 64)
-	//TODO: Verify user_id from token
+
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok || userID != uint(uID) {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())
@@ -38,7 +38,7 @@ func GetUserInfo(c *gin.Context) {
 func UpdateUserInfo(c *gin.Context) {
 	id := c.Param("id")
 	uID, _ := strconv.ParseUint(id, 10, 64)
-	//TODO: Verify user_id from token
+
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok || userID != uint(uID) {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())

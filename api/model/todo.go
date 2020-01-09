@@ -52,7 +52,7 @@ func GetTodo(id, userID uint) (*Todo, error) {
 }
 
 func (todo *Todo) UpdateTodo() (*Todo, error) {
-	//TODO: Get to-do by id and owner id
+
 	currentTodo, err := GetTodo(todo.ID, todo.UserID)
 	if err != nil {
 		return nil, err

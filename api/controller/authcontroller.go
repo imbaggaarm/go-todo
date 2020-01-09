@@ -51,13 +51,14 @@ func Login(c *gin.Context) {
 		Data:    user,
 	})
 }
+
 //
 //func Logout(c *gin.Context) {
 //
 //}
 
 func ChangePassword(c *gin.Context) {
-	//TODO: Validate user's token
+
 	email, ok := util.GetEmailFromContext(c)
 	if !ok {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())
@@ -93,6 +94,7 @@ func ChangePassword(c *gin.Context) {
 		Data:    nil,
 	})
 }
+
 //
 //func ForgotPassword(c *gin.Context) {
 //

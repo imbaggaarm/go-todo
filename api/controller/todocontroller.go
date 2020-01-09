@@ -40,7 +40,6 @@ func GetTodo(c *gin.Context) {
 	id := c.Param("id")
 	uID, _ := strconv.ParseUint(id, 10, 64)
 
-	// TODO: Get user id from token
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())
@@ -71,7 +70,7 @@ func UpdateTodo(c *gin.Context) {
 		return
 	}
 	todo.ID = uint(uID)
-	// TODO: Get user id from token
+
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())
@@ -97,7 +96,7 @@ func UpdateTodo(c *gin.Context) {
 func DeleteTodo(c *gin.Context) {
 	id := c.Param("id")
 	uID, _ := strconv.ParseUint(id, 10, 10)
-	// TODO: Get user id from token
+
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
 		c.JSON(http.StatusOK, model.UnauthorizedResponse())
