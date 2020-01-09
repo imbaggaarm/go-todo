@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-todo/api/common"
 	"go-todo/api/model"
 	u "go-todo/api/util"
 	"net/http"
@@ -14,17 +15,17 @@ func GetUserInfo(c *gin.Context) {
 
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok || userID != uint(uID) {
-		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		c.JSON(http.StatusOK, common.UnauthorizedResponse())
 		return
 	}
 
 	user, err := model.GetUser(uint(uID))
 	if err != nil {
-		c.JSON(http.StatusOK, model.ErrorResponse(err))
+		c.JSON(http.StatusOK, common.ErrorResponse(err))
 		return
 	}
 	user.Password = ""
-	c.JSON(http.StatusOK, model.SuccessResponse(user))
+	c.JSON(http.StatusOK, common.SuccessResponse(user))
 }
 
 func UpdateUserInfo(c *gin.Context) {
@@ -33,7 +34,7 @@ func UpdateUserInfo(c *gin.Context) {
 
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok || userID != uint(uID) {
-		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		c.JSON(http.StatusOK, common.UnauthorizedResponse())
 		return
 	}
 	user := &model.User{}
@@ -44,9 +45,9 @@ func UpdateUserInfo(c *gin.Context) {
 	user.ID = userID
 	updatedUser, err := user.Update()
 	if err != nil {
-		c.JSON(http.StatusOK, model.ErrorResponse(err))
+		c.JSON(http.StatusOK, common.ErrorResponse(err))
 		return
 	}
 	updatedUser.Password = ""
-	c.JSON(http.StatusOK, model.SuccessResponse(updatedUser))
+	c.JSON(http.StatusOK, common.SuccessResponse(updatedUser))
 }

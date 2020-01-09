@@ -1,8 +1,8 @@
 package model
 
 import (
-	"errors"
 	"github.com/jinzhu/gorm"
+	"go-todo/api/util/errformatter"
 	"time"
 )
 
@@ -20,7 +20,7 @@ type Todo struct {
 func (todo *Todo) CreateTodo() error {
 	GetDB().Create(todo)
 	if todo.ID <= 0 {
-		return errors.New("create todo failed. Please retry")
+		return errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return nil
 }
@@ -34,7 +34,7 @@ func GetUserTodos(userID, offSet uint) (*[]Todo, error) {
 		Limit(20).
 		Find(&results).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, errors.New("connection error. Retry later")
+		return nil, errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return &results, nil
 }
@@ -44,9 +44,9 @@ func GetTodo(id, userID uint) (*Todo, error) {
 	err := GetDB().Where("id = ? and user_id = ?", id, userID).First(todo).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("todo not found")
+			return nil, errformatter.NewError(errformatter.ErrorRecordNotFound)
 		}
-		return nil, errors.New("connection error. Please retry")
+		return nil, errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return todo, nil
 }
@@ -68,7 +68,7 @@ func (todo *Todo) UpdateTodo() (*Todo, error) {
 
 	err = GetDB().Save(currentTodo).Error
 	if err != nil {
-		return nil, errors.New("update todo failed. Please retry")
+		return nil, errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return currentTodo, nil
 }
@@ -76,7 +76,7 @@ func (todo *Todo) UpdateTodo() (*Todo, error) {
 func DeleteTodo(id uint, userID uint) error {
 	err := GetDB().Delete(Todo{}, "id = ? and user_id = ?", id, userID).Error
 	if err != nil {
-		return errors.New("connection error. Please retry")
+		return errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return nil
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-todo/api/common"
 	"go-todo/api/model"
 	u "go-todo/api/util"
 	"net/http"
@@ -16,16 +17,16 @@ func CreateTodo(c *gin.Context) {
 	}
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
-		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		c.JSON(http.StatusOK, common.UnauthorizedResponse())
 		return
 	}
 	todo.UserID = userID
 	err := todo.CreateTodo()
 	if err != nil {
-		c.JSON(http.StatusOK, model.ErrorResponse(err))
+		c.JSON(http.StatusOK, common.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.SuccessResponse(todo))
+	c.JSON(http.StatusOK, common.SuccessResponse(todo))
 }
 
 func GetTodo(c *gin.Context) {
@@ -34,15 +35,15 @@ func GetTodo(c *gin.Context) {
 
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
-		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		c.JSON(http.StatusOK, common.UnauthorizedResponse())
 		return
 	}
 	todo, err := model.GetTodo(uint(uID), userID)
 	if err != nil {
-		c.JSON(http.StatusOK, model.ErrorResponse(err))
+		c.JSON(http.StatusOK, common.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.SuccessResponse(todo))
+	c.JSON(http.StatusOK, common.SuccessResponse(todo))
 }
 
 func UpdateTodo(c *gin.Context) {
@@ -57,16 +58,16 @@ func UpdateTodo(c *gin.Context) {
 
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
-		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		c.JSON(http.StatusOK, common.UnauthorizedResponse())
 		return
 	}
 	todo.UserID = userID
 	updatedTodo, err := todo.UpdateTodo()
 	if err != nil {
-		c.JSON(http.StatusOK, model.ErrorResponse(err))
+		c.JSON(http.StatusOK, common.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.SuccessResponse(updatedTodo))
+	c.JSON(http.StatusOK, common.SuccessResponse(updatedTodo))
 }
 
 func DeleteTodo(c *gin.Context) {
@@ -75,13 +76,13 @@ func DeleteTodo(c *gin.Context) {
 
 	userID, ok := u.GetUserIDFromContext(c)
 	if !ok {
-		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		c.JSON(http.StatusOK, common.UnauthorizedResponse())
 		return
 	}
 	err := model.DeleteTodo(uint(uID), userID)
 	if err != nil {
-		c.JSON(http.StatusOK, model.ErrorResponse(err))
+		c.JSON(http.StatusOK, common.ErrorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, model.SuccessResponse(nil))
+	c.JSON(http.StatusOK, common.SuccessResponse(nil))
 }

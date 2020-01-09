@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"go-todo/api/auth"
 	"go-todo/api/security"
+	"go-todo/api/util/errformatter"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -30,10 +31,10 @@ func (user *User) Validate() error {
 	temp := &User{}
 	err := GetDB().Where("email = ?", user.Email).First(temp).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return errors.New("connection error")
+		return errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	if temp.Email != "" {
-		return errors.New("email existed")
+		return errformatter.NewError(errformatter.ErrorUserExisted)
 	}
 
 	return nil
@@ -54,7 +55,7 @@ func (user *User) Create() error {
 	GetDB().Create(user)
 
 	if user.ID <= 0 {
-		return errors.New("connection error")
+		return errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	user.setToken()
 	return nil
@@ -65,13 +66,13 @@ func verifyUser(email, password string) (*User, error) {
 	err := GetDB().Where("email = ?", email).First(user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("account not found")
+			return nil, errformatter.NewError(errformatter.ErrorRecordNotFound)
 		}
 		return nil, errors.New("connection error")
 	}
 	err = security.VerifyPassword(user.Password, password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return nil, errors.New("wrong password")
+		return nil, errformatter.NewError(errformatter.ErrorWrongPassword)
 	}
 	return user, nil
 }
@@ -105,7 +106,7 @@ func GetUser(userID uint) (*User, error) {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("account not found")
 		}
-		return nil, errors.New("connection error. Please retry")
+		return nil, errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return user, nil
 }
@@ -118,7 +119,7 @@ func (user *User) Update() (*User, error) {
 	currentUser.LastName = user.LastName
 	err = GetDB().Save(currentUser).Error
 	if err != nil {
-		return nil, errors.New("update todo failed. Please retry")
+		return nil, errformatter.NewError(errformatter.ErrorDatabaseConnection)
 	}
 	return currentUser, nil
 }

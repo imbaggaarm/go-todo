@@ -1,15 +1,17 @@
-package model
+package common
+
+import . "go-todo/api/util/errformatter"
 
 type Response struct {
 	Success bool        `json:"success"`
-	Error   string      `json:"error,omitempty"`
+	Error   ErrorType   `json:"error,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
 func UnauthorizedResponse() Response {
 	return Response{
 		Success: false,
-		Error:   "Unauthorized",
+		Error:   ErrorUnauthorized,
 		Data:    nil,
 	}
 }
@@ -17,7 +19,7 @@ func UnauthorizedResponse() Response {
 func ErrorResponse(err error) Response {
 	return Response{
 		Success: false,
-		Error:   err.Error(),
+		Error:   ErrorType(err.Error()),
 		Data:    nil,
 	}
 }
