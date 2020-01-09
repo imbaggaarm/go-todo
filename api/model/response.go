@@ -5,3 +5,12 @@ type Response struct {
 	Error   string      `json:"error,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 }
+
+func UnauthorizedResponse() Response {
+	return Response{
+		Success: false,
+		Error:   "Unauthorized",
+		Data:    nil,
+	}
+}
+

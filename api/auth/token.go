@@ -12,21 +12,22 @@ const (
 )
 
 type Token struct {
-	jwt.Claims
-	UserID uint `json:"user_id"`
+	jwt.StandardClaims
+	UserID uint   `json:"user_id"`
+	Email  string `json:"email"`
 }
 
-func CreateTokenString(userID uint) string {
-	tk := Token{UserID: userID}
+func CreateTokenString(userID uint, email string) string {
+	tk := Token{UserID: userID, Email: email}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, _ := token.SignedString([]byte(os.Getenv("TODO_APP_TOKEN_PASSWORD")))
 	return tokenString
 }
 
-func ValidateToken(r *http.Request) bool {
+func ValidateToken(r *http.Request) (*Token, bool) {
 	strToken := ExtractToken(r)
 	if strToken == "" {
-		return false
+		return nil, false
 	}
 	tk := &Token{}
 	token, err := jwt.ParseWithClaims(strToken, tk, func(token *jwt.Token) (interface{}, error) {
@@ -34,10 +35,10 @@ func ValidateToken(r *http.Request) bool {
 	})
 
 	if err != nil {
-		return false
+		return nil, false
 	}
 
-	return token.Valid
+	return tk, token.Valid
 }
 
 func ExtractToken(r *http.Request) string {

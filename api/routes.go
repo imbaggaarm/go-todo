@@ -17,15 +17,15 @@ func (s *Server) configureRoutes() {
 		auth := v1.Group("/auth")
 		auth.POST("/register", controller.RegisterAccount)
 		auth.POST("/login", controller.Login)
-		auth.GET("/logout", controller.Logout)
+		//auth.GET("/logout", controller.Logout)
 		auth.POST("/password/change", middleware.AuthMiddleWare(), controller.ChangePassword)
-		auth.POST("/password/forgot", controller.ForgotPassword)
-		auth.POST("/password/reset", controller.ResetPassword)
+		//auth.POST("/password/forgot", controller.ForgotPassword)
+		//auth.POST("/password/reset", controller.ResetPassword)
 
 		// User routes
 		users := v1.Group("/users")
-		users.GET("/:id", middleware.AuthMiddleWare(), controller.GetUser)
-		users.PUT("/:id", middleware.AuthMiddleWare(), controller.UpdateUser)
+		users.GET("/:id", middleware.AuthMiddleWare(), controller.GetUserInfo)
+		users.PUT("/:id", middleware.AuthMiddleWare(), controller.UpdateUserInfo)
 
 		// To-dos routes
 		todo := v1.Group("/todo")

@@ -4,6 +4,7 @@ import (
 	validator "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"go-todo/api/model"
+	"go-todo/api/util"
 	"net/http"
 )
 
@@ -13,8 +14,20 @@ func RegisterAccount(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	resp := user.Create()
-	c.JSON(http.StatusOK, resp)
+	err := user.Create()
+	if err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Success: false,
+			Error:   err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Success: true,
+		Error:   "",
+		Data:    user,
+	})
 }
 
 func Login(c *gin.Context) {
@@ -23,15 +36,33 @@ func Login(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	resp := model.Login(user.Email, user.Password)
-	c.JSON(http.StatusOK, resp)
+	user, err := model.Login(user.Email, user.Password)
+	if err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Success: false,
+			Error:   err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Success: true,
+		Error:   "",
+		Data:    user,
+	})
 }
-
-func Logout(c *gin.Context) {
-
-}
+//
+//func Logout(c *gin.Context) {
+//
+//}
 
 func ChangePassword(c *gin.Context) {
+	//TODO: Validate user's token
+	email, ok := util.GetEmailFromContext(c)
+	if !ok {
+		c.JSON(http.StatusOK, model.UnauthorizedResponse())
+		return
+	}
 	request := &model.UpdatePasswordRequest{}
 	if err := c.BindJSON(request); err != nil {
 		c.Status(http.StatusBadRequest)
@@ -47,14 +78,26 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 	// Update password
-	resp := model.UpdatePassword(request.Email, request.Password, request.NewPassword)
-	c.JSON(http.StatusOK, resp)
+	err = model.UpdatePassword(email, request.Password, request.NewPassword)
+	if err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Success: false,
+			Error:   err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Success: true,
+		Error:   "",
+		Data:    nil,
+	})
 }
-
-func ForgotPassword(c *gin.Context) {
-
-}
-
-func ResetPassword(c *gin.Context) {
-
-}
+//
+//func ForgotPassword(c *gin.Context) {
+//
+//}
+//
+//func ResetPassword(c *gin.Context) {
+//
+//}
