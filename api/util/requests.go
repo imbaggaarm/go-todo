@@ -1,4 +1,4 @@
-package common
+package util
 
 type UpdatePasswordRequest struct {
 	Password    string `json:"password" valid:"required,stringlength(6|256)"`
