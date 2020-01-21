@@ -12,8 +12,8 @@ type Server struct {
 }
 
 func (s *Server) Run(port string) error {
-	server.Router = gin.Default()
-	server.configureRoutes()
+	s.Router = gin.Default()
+	s.configureRoutes()
 
 	return s.Router.Run(port)
 }
